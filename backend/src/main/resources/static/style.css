@@ -1,0 +1,21 @@
+body {
+    font-family: "Cormorant", serif;
+}
+  
+  h1 {
+    font-family: "Cormorant", serif;
+    color: blue;
+  }
+  .imageContainer {
+    margin-right:100px;
+    width: 800px;
+    height: 250px; 
+    font-size: 20px;
+   
+    background-image: url("box.jpg");
+}
+ 
+  #score {
+    margin-top: 20px;
+    font-size: 24px;
+  }
