@@ -3,48 +3,78 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width,initial-scale=1">
-        
         <link rel="stylesheet" href="style.css">
-
         <link rel="stylesheet" href="https://fonts.googleapis.com">
         <link rel="stylesheet" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300..700;1,300..700&display=swap" rel="stylesheet">
         <title>Leftover Chef</title>
+        <style>
+            body { 
+                background-color: #f7ffdd; 
+            }
+            .food-saved {
+                margin: 20px;
+            }
+            .generateMeal {
+                position: absolute;
+                left: 500px;
+                top: 500px;
+            }
+            .ingredients-box textarea {
+                position: absolute;
+                left: 450px;
+                height: 300px;
+                width: 500px;
+                top: 150px;
+                background-color: #efd780;
+            }
+            .page-title {
+                font-size: 50px;
+            }
+            .instructions-btn {
+                position: absolute;
+                right: 20px;
+                top: 50px;
+            }
+            .ingredients-label {
+                position: absolute;
+                left: 450px;
+                top: 70px;
+                font-size: 30px;
+            }
+            .fridge-image {
+                position: absolute;
+                margin-left: 0;
+                width: 400px;
+                height: 450px;
+            }
+        </style>
     </head>
     <body>
-        <h1 > Leftover Chef
-            <img id="img" src="logo.png" width="30" height="30">
-            
-            <a href="instruct.html ">
-
-           <input style="position: absolute; right: 5px; top=50px" type="image" src="instruct.png" name="saveForm"  class="btTxt submit" id="saveForm" /> </a>
-
-            
+        <h1 class="page-title"> 
+            Leftover Chef
+            <img id="logo" src="logo_cooking.png" width="50" height="50">
+            <a href="instruct.html">
+                <input type="image" src="instructions.png" class="instructions-btn" width="50" height="50" alt="Instructions">
+            </a>
         </h1>
-        <div class="food-saved"
-            style="position:absolute; right:80px;top:40px">
+
+        <div class="food-saved">
             <strong>Food Saved:</strong> <span id="food-saved">0</span> lbs
-            
-           
         </div>
-        <img style= "position: absolute; margin-left: 0px;width:400px;height:450px;" id="img" src="openfridge.png">
 
+        <img class="fridge-image" src="open_fridge.png" alt="Open Fridge">
         
-       <a href="recipe.html">
-
-        <button style= "position: absolute; left:600px; top:500px;" type="submit">Generate Meal</button>
-    </a>
+        <a href="recipe.html">
+        <button class="generateMeal" type="submit">Generate Meal</button>
+        </a>
       
-        
-        <p style="position:absolute;left: 450px; top: 70px; ">  Input Leftover Ingredients: </p>
+        <p class="ingredients-label"><strong>Input Leftover Ingredients:</strong></p>
 
         <div class="ingredients-box">
-            <textarea style= "position: absolute; left: 450px; height: 300px; width: 500px; top:150px" id="input-text"
-                    placeholder="Enter Ingredients">
-            </textarea>
+            <textarea id="input-text" placeholder="Enter ingredients separated by commas (e.g., chicken, rice, onion)"></textarea>
         </div>
+
+        <script src="script.js"></script>
     </body>
-
-    
-
 </html>

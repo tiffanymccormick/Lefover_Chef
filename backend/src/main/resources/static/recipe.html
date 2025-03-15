@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com">
+    <link rel="stylesheet" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300..700;1,300..700&display=swap" rel="stylesheet">
+    <title>Recipe Details</title>
+    <style>
+        .recipe-section {
+            margin-bottom: 20px;
+            padding: 15px;
+        }
+        .recipe-section h3 {
+            color: #666;
+            margin-bottom: 10px;
+        }
+        .recipe-section ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        .recipe-section li {
+            margin-bottom: 8px;
+        }
+        .recipe-title {
+            color: #dba159;
+            margin-bottom: 20px;
+            font-size: 30px;
+            margin-left: 300px;
+        }
+        .recipe-instructions {
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+        .estimated-time {
+            color: #666;
+            font-style: italic;
+            margin-bottom: 15px;
+        }
+        #error-message {
+            color: #ff4444;
+            text-align: center;
+            margin: 20px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Leftover Chef
+        <img src="logo_cooking.png" width="50" height="50" alt="Logo">
+        <a href="instruct.html">
+            <input type="image" src="instructions.png" width="50" height="50" 
+                   style="position: absolute; right: 20px; top: 20px"
+                   alt="Instructions" class="btTxt submit" id="saveForm">
+        </a>
+    </h1>
+
+    <div class="food-saved">
+        <strong>Food Saved:</strong> <span id="food-saved">0</span> lbs
+    </div>
+
+    <div class="image-container">
+        <img src="closed_fridge.png" id="fridge-img" alt="Closed Fridge"
+             style="position: absolute; margin-left: 10px; width: 260px; height: 430px; top: 8px">
+        <img class="overlay-image" id="magnet1" style="position: absolute; top: 60px; margin-left: 30px" alt="Magnet 1">
+        <img class="overlay-image" id="magnet2" style="position: absolute; top: 200px; margin-left: 120px" alt="Magnet 2">
+        <img class="overlay-image" id="magnet3" style="position: absolute; top: 300px; margin-left: 60px" alt="Magnet 3">
+        <button class="btn-open-popup" onclick="togglePopup()" 
+                style="position: absolute; left: 90px; top: 450px">Add Magnets</button>
+
+        <div id="popupOverlay" class="overlay-container">
+            <div class="overlay-image">
+                <div class="popup-box">
+                    <h2 style="color: #dba159;">Add Magnets</h2>
+                    
+                    <form id="upload-form1" class="form-container">
+                        <label class="form-label">Add magnet:</label>
+                        <input type="file" id="imageUpload1" accept="image/*" required>
+                        <button class="btn-submit" type="submit">Upload Image</button>   
+                    </form>
+
+                    <form id="upload-form2" class="form-container">
+                        <label class="form-label">Add magnet:</label>
+                        <input type="file" id="imageUpload2" accept="image/*" required>
+                        <button class="btn-submit" type="submit">Upload Image</button>   
+                    </form>
+
+                    <form id="upload-form3" class="form-container">
+                        <label class="form-label">Add magnet:</label>
+                        <input type="file" id="imageUpload3" accept="image/*" required>
+                        <button class="btn-submit" type="submit">Upload Image</button>   
+                    </form>
+
+                    <button class="btn-close-popup" onclick="togglePopup()">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="error-message">No recipe found. Please try different ingredients.</div>
+
+    <h2 class="recipe-title" id="recipe-title"></h2>
+    <div class="recipeContainer">
+        <div class="estimated-time" id="estimated-time"></div>
+        <div class="recipe-section">
+            <h3>Ingredients:</h3>
+            <ul id="ingredients-list"></ul>
+        </div>
+        <div class="recipe-section">
+            <h3>Instructions:</h3>
+            <div class="recipe-instructions" id="instructions"></div>
+        </div>
+    </div>
+
+    <button class="newMeal" id="newMealBtn">New Meal</button>
+    <a href="index.html">
+        <button class="backb">Back</button>
+    </a>
+
+    <script>
+        function togglePopup() {
+            const overlay = document.getElementById('popupOverlay');
+            overlay.style.display = overlay.style.display === 'none' ? 'flex' : 'none';
+            overlay.style.opacity = overlay.style.display === 'flex' ? '1' : '0';
+        }
+
+        function handleImageUpload(formId, magnetId) {
+            document.getElementById(formId).addEventListener('submit', function(e) {
+                e.preventDefault();
+                const file = document.getElementById(magnetId).files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        const img = document.getElementById(magnetId.replace('Upload', ''));
+                        img.src = event.target.result;
+                        img.style.display = 'block';
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+
+        function displayRecipe(recipe) {
+            if (!recipe) {
+                document.getElementById('error-message').style.display = 'block';
+                document.querySelector('.recipeContainer').style.display = 'none';
+                return;
+            }
+
+            document.getElementById('error-message').style.display = 'none';
+            document.querySelector('.recipeContainer').style.display = 'block';
+            
+            document.getElementById('recipe-title').textContent = recipe.Title || recipe.title || 'Recipe Name';
+            
+            if (recipe.estimatedTimeMinutes || recipe.Estimated_Time_Minutes) {
+                document.getElementById('estimated-time').textContent = 
+                    `Estimated Time: ${recipe.Estimated_Time_Minutes || recipe.estimatedTimeMinutes} minutes`;
+            }
+            
+            const ingredientsList = document.getElementById('ingredients-list');
+            ingredientsList.innerHTML = '';
+            if (recipe.cleanedIngredients && recipe.cleanedIngredients.length > 0) {
+                recipe.cleanedIngredients.forEach(ingredient => {
+                    const li = document.createElement('li');
+                    li.textContent = ingredient;
+                    ingredientsList.appendChild(li);
+                });
+            }
+            
+            const instructions = document.getElementById('instructions');
+            instructions.textContent = recipe.Instructions || recipe.instructions || 'No instructions available';
+            console.log('Recipe data:', recipe); // Debug log
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set up magnet upload handlers
+            handleImageUpload('upload-form1', 'imageUpload1');
+            handleImageUpload('upload-form2', 'imageUpload2');
+            handleImageUpload('upload-form3', 'imageUpload3');
+
+            // Try to load recipe from localStorage
+            try {
+                const recipe = JSON.parse(localStorage.getItem('currentRecipe'));
+                console.log('Loaded recipe:', recipe); // Debug log
+                displayRecipe(recipe);
+            } catch (error) {
+                console.error('Error loading recipe:', error);
+                displayRecipe(null);
+            }
+
+            // Handle "New Meal" button click
+            document.getElementById('newMealBtn').addEventListener('click', function() {
+                const recipe = JSON.parse(localStorage.getItem('currentRecipe'));
+                if (!recipe || !recipe.cleanedIngredients) {
+                    alert('No recipe ingredients available. Please start from the main page.');
+                    return;
+                }
+
+                fetch('/api/recipes/alternative', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ ingredients: recipe.cleanedIngredients })
+                })
+                .then(response => {
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                    return response.json();
+                })
+                .then(newRecipe => {
+                    if (!newRecipe) throw new Error('No alternative recipe found');
+                    localStorage.setItem('currentRecipe', JSON.stringify(newRecipe));
+                    displayRecipe(newRecipe);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('No alternative recipe found. Please try different ingredients.');
+                });
+            });
+
+            // Update food saved count
+            fetch('/api/food-saved')
+                .then(response => response.json())
+                .then(pounds => {
+                    document.getElementById('food-saved').textContent = pounds.toFixed(1);
+                })
+                .catch(error => {
+                    console.error('Error fetching food saved:', error);
+                });
+        });
+    </script>
+</body>
+</html>
