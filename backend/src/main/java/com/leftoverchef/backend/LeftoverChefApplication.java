@@ -6,8 +6,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class LeftoverChefApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(LeftoverChefApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(LeftoverChefApplication.class, args);
+    }
 
 }

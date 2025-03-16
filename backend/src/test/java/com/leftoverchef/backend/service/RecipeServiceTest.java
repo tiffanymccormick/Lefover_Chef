@@ -20,14 +20,16 @@ class RecipeServiceTest {
         Recipe recipe1 = new Recipe();
         recipe1.setRecipeIndex("1");
         recipe1.setTitle("Pancakes");
-        recipe1.setCleanedIngredientsFromString("[\"flour\", \"milk\", \"eggs\", \"sugar\"]");
+        recipe1.setCleanedIngredients(Arrays.asList("flour", "milk", "eggs", "sugar"));
         recipe1.setEstimatedPounds("1.5");
+        recipe1.setInstructions("Mix ingredients and cook on griddle");
 
         Recipe recipe2 = new Recipe();
         recipe2.setRecipeIndex("2");
         recipe2.setTitle("Chicken Stir Fry");
-        recipe2.setCleanedIngredientsFromString("[\"chicken\", \"rice\", \"onion\", \"carrots\"]");
+        recipe2.setCleanedIngredients(Arrays.asList("chicken", "rice", "onion", "carrots"));
         recipe2.setEstimatedPounds("2.0");
+        recipe2.setInstructions("Stir fry chicken and vegetables with rice");
 
         // Set test recipes in service
         List<Recipe> testRecipes = Arrays.asList(recipe1, recipe2);
@@ -41,6 +43,7 @@ class RecipeServiceTest {
         
         assertNotNull(match);
         assertEquals("Chicken Stir Fry", match.getTitle());
+        assertNotNull(match.getInstructions());
     }
 
     @Test
