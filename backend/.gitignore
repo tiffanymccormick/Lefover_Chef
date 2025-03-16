@@ -1,5 +1,5 @@
 # Large data files
-src/main/resources/*.json
+src/main/resources/Final_Updated_Recipe_Data_with_weights.json
 !package.json
 !package-lock.json
 
