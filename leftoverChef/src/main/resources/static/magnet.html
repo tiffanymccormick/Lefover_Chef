@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1">
+        <link rel="stylesheet" href="style.css">
+        <title>Add Magnets</title>
+
+        <style>
+            body { background-color: #f7ffdd; }
+        </style>
+         <form id="uploadForm">
+            <label for="imageUpload" >Add Magnet:</label>
+            <input multiple type="file" id="imageUpload" accept="image/*" required>
+            <button type="submit">Upload Image</button>
+        </form>
+    
+        <img  class="overlay-image" id="preview1">
+    </head>
+
+    <a href="recipe.html" >
+
+            <button class="backb" style= "position: absolute; left:960px; top: 600px; width:100px;height:40px" type="submit">Back</button>
+        </a>
+    <body>
+        <script>
+            document.getElementById('uploadForm1').addEventListener('submit', function (e) {
+                e.preventDefault();
+                const file = document.getElementById('imageUpload1').files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function (event) {
+                        
+                        const img = document.getElementById('preview1');
+                        img.src = event.target.result;
+                        img.style.display = 'block';
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        </script>
+        
+    </body>
+</html>

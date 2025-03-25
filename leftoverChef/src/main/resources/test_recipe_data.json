@@ -1,0 +1,12 @@
+[
+  {
+    "id": "test1",
+    "name": "Test Recipe",
+    "ingredients": ["ingredient1", "ingredient2"],
+    "instructions": ["step1", "step2"],
+    "cookTime": "30 mins",
+    "prepTime": "10 mins",
+    "totalTime": "40 mins",
+    "recipeYield": "4 servings"
+  }
+]

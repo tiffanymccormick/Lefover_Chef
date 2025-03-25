@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <head>
+        <meta charset="UTF-8">
+        <link rel="stylesheet" href="style.css">
+
+        <link rel="stylesheet" href="https://fonts.googleapis.com">
+        <link rel="stylesheet" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300..700;1,300..700&display=swap" rel="stylesheet">
+        <title>Title</title>
+        <style>
+            body { background-color: #f7ffdd; }
+        </style>
+    </head>
+    <body>
+        <h1 style="font-size:50px"> Leftover Chef
+            <img id="img" src="logo_cooking.png" width="50" height="50">
+            
+
+            <a href="instruct.html ">
+
+                <input style="position: absolute; right: 20px; top=0px" type="image" src="instructions.png" width=50px height=50px name="saveForm"  class="btTxt submit" id="saveForm" /> 
+            </a>
+        </h1>
+
+        
+        <div class="food-saved"
+            <strong>Food Saved:</strong> <span id="food-saved">0</span> lbs
+        </div>
+       
+        <div class="image-container">
+
+            <img style= "position: absolute; margin-left: 10px; 
+            width:260px;height:430px; top: 8px" id="img" src="closed_fridge.png">
+
+            <img  class="overlay-image" id="magnet1" style="position:absolute; top: 60px;margin-left:30px">
+
+            <img  class="overlay-image" id="magnet2" style="position:absolute; top: 200px;margin-left:120px">
+
+            <img  class="overlay-image" id="magnet3" style="position:absolute; top: 300px;margin-left:60px">
+
+            <button class="btn-open-popup" onclick="togglePopup()" style="position: absolute; left: 90px; top:450px" type="image" width=50px height=50px > Add Magnets
+            </button>
+      
+          <div id="popupOverlay" 
+               class="overlay-container">
+               <div class="overlay-image">
+
+              <div class="popup-box">
+
+                  <h2 style="color: #dba159;">Add Magnets</h2>
+                  
+                  <!--FIRST MAGNET-->
+                  <form id= "upload-form1" class="form-container">
+                      <label class="form-label">
+                        Add magnet:
+                        </label>
+                    
+                    <input multiple type="file" id="imageUpload1" accept="image/*" required>
+
+                    <button class="btn-submit" type="submit">Upload Image</button>   
+
+                  </form>
+
+                  <!--SECOND MAGNET-->
+                  <form id= "upload-form2" class="form-container">
+                    <label class="form-label" 
+                          >
+                      Add magnet:
+                      </label>
+                  
+                  <input multiple type="file" id="imageUpload2" accept="image/*" required>
+
+                  <button class="btn-submit" type="submit">Upload Image</button>   
+
+                </form>
+      
+                <!--THIRD MAGNET-->
+                <form id= "upload-form3" class="form-container">
+                    <label class="form-label" 
+                          >
+                      Add magnet:
+                      </label>
+                  
+                  <input multiple type="file" id="imageUpload3" accept="image/*" required>
+
+                  <button class="btn-submit" type="submit">Upload Image</button>   
+
+                </form>
+
+
+                  <button class="btn-close-popup" 
+                          onclick="togglePopup()">
+                    Close
+                    </button>
+              </div>
+            </div>
+
+          </div>
+      
+          <script>
+              function togglePopup() {
+                  const overlay = document.getElementById('popupOverlay');
+                  overlay.classList.toggle('show');
+              }
+              
+              //FIRST MAGNET
+              document.getElementById('upload-form1').addEventListener('submit', function (e) {
+                e.preventDefault();
+                const file = document.getElementById('imageUpload1').files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function (event) {
+                        
+                        const img = document.getElementById('magnet1');
+                        img.src = event.target.result;
+                        img.style.display = 'block';
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            //SECOND MAGNET
+            document.getElementById('upload-form2').addEventListener('submit', function (e) {
+                e.preventDefault();
+                const file = document.getElementById('imageUpload2').files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function (event) {
+                        
+                        const img = document.getElementById('magnet2');
+                        img.src = event.target.result;
+                        img.style.display = 'block';
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            //THIRD MAGNET
+            document.getElementById('upload-form3').addEventListener('submit', function (e) {
+                e.preventDefault();
+                const file = document.getElementById('imageUpload3').files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function (event) {
+                        
+                        const img = document.getElementById('magnet3');
+                        img.src = event.target.result;
+                        img.style.display = 'block';
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+          </script>
+
+        </div>
+
+        <a href="index.html" >
+
+            <button class="backb" style= "position: absolute; left:960px; top: 600px; width:100px;height:40px" type="submit">Back</button>
+        </a>
+
+        <body>
+            <b style="font-size:30px; margin-left:300px;top:8px"> Recipe Name</b>
+            <div class="recipeContainer">
+                <p> recipe </p> 
+            </div>
+
+            
+
+        <button class="newMeal" style= "position: absolute; left:950px; top:500px;" type="submit">New Meal</button>
+    <!--
+        <img  class="overlay-image" id="previewr1" style="position:absolute; bottom: 10px;right:10px">
+        <script>
+            document.getElementById('uploadForm').addEventListener('submit', function (e) {
+                e.preventDefault();
+                const file = document.getElementById('imageUpload').files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function (event) {
+                        const img = document.getElementById('preview');
+                        img.src = event.target.result;
+                        img.style.display = 'block';
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        </script>
+
+        -->
+    
+
+
+        
+       
