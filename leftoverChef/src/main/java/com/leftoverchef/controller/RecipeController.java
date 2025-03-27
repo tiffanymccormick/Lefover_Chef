@@ -4,6 +4,7 @@ import com.leftoverchef.model.Recipe;
 import com.leftoverchef.service.RecipeService;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -27,7 +28,16 @@ public class RecipeController {
     }
 
     @GetMapping("/search")
-    public List<Recipe> findRecipesByIngredients(@RequestParam List<String> ingredients) {
-        return recipeService.findRecipesByIngredients(ingredients);
+    public List<Recipe> findRecipesByIngredients(
+            @RequestParam List<String> ingredients,
+            @RequestParam(required = false) List<String> excludeIds) {
+        // Initialize empty list if excludeIds is null
+        List<String> excludeList = excludeIds != null ? excludeIds : new ArrayList<>();
+        
+        // Get all matching recipes sorted by score
+        List<Recipe> matchedRecipes = recipeService.findRecipesByIngredients(ingredients, excludeList);
+        
+        // Return only the first recipe if there are matches
+        return !matchedRecipes.isEmpty() ? List.of(matchedRecipes.get(0)) : new ArrayList<>();
     }
 }
