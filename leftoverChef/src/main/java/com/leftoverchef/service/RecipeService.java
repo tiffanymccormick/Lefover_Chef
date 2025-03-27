@@ -36,6 +36,14 @@ public class RecipeService {
                     try {
                         Recipe recipe = objectMapper.treeToValue(recipeNode, Recipe.class);
                         recipe.setId(UUID.randomUUID().toString()); // Generate unique ID
+                        
+                        // Ensure cleanedIngredients is populated
+                        if (recipe.getCleanedIngredients() == null || recipe.getCleanedIngredients().isEmpty()) {
+                            recipe.setCleanedIngredients(recipe.getIngredients().stream()
+                                .map(ingredient -> ingredient.getName().toLowerCase())
+                                .collect(Collectors.toList()));
+                        }
+                        
                         recipes.add(recipe);
                     } catch (Exception e) {
                         logger.error("Error parsing recipe: " + e.getMessage());
@@ -92,18 +100,27 @@ public class RecipeService {
             return 0.0;
         }
 
+        // Normalize all strings to lowercase for comparison
+        List<String> normalizedUserIngredients = userIngredients.stream()
+            .map(String::toLowerCase)
+            .collect(Collectors.toList());
+
+        List<String> normalizedRecipeIngredients = recipeIngredients.stream()
+            .map(String::toLowerCase)
+            .collect(Collectors.toList());
+
         // Count how many user ingredients are found in the recipe
-        long matchedIngredients = userIngredients.stream()
-                .filter(userIngr -> recipeIngredients.stream()
-                        .anyMatch(recipeIngr -> recipeIngr.toLowerCase().contains(userIngr)))
-                .count();
+        long matchedIngredients = normalizedUserIngredients.stream()
+            .filter(userIngr -> normalizedRecipeIngredients.stream()
+                .anyMatch(recipeIngr -> recipeIngr.contains(userIngr) || userIngr.contains(recipeIngr)))
+            .count();
 
         // Calculate both fractions
         double userFraction = (double) matchedIngredients / userIngredients.size();
         double recipeFraction = (double) matchedIngredients / recipeIngredients.size();
 
-        // Combine scores with equal weight
-        return userFraction * recipeFraction;
+        // Combine scores with more weight on user ingredients
+        return (userFraction * 0.7) + (recipeFraction * 0.3);
     }
 
     private void copyProperties(Recipe source, Recipe target) {
@@ -115,5 +132,6 @@ public class RecipeService {
         target.setImageName(source.getImageName());
         target.setEstimatedTimeMinutes(source.getEstimatedTimeMinutes());
         target.setEstimatedPounds(source.getEstimatedPounds());
+        target.setMatchScore(source.getMatchScore());
     }
 }

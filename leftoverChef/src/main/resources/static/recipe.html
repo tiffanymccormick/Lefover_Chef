@@ -16,10 +16,19 @@
                 position: absolute;
                 left: 300px;
                 top: 150px;
-                width: 500px;
+                right: 20px;
                 background-color: #efd780;
                 padding: 20px;
                 border-radius: 10px;
+                display: flex;
+                flex-direction: column;
+                min-height: 400px;
+            }
+            .recipe-content {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                position: relative;
                 margin-bottom: 20px;
             }
             .recipe-title {
@@ -28,10 +37,19 @@
                 font-weight: bold;
                 font-family: 'Cormorant', serif;
             }
+            .recipe-ingredients {
+                white-space: pre-line;
+                line-height: 1.6;
+                margin-top: 10px;
+                margin-bottom: 20px;
+                font-family: 'Cormorant', serif;
+            }
             .recipe-instructions {
                 white-space: pre-line;
                 line-height: 1.6;
-                margin-top: 20px;
+                flex: 1;
+                overflow-y: auto;
+                padding-right: 10px;
             }
             .match-score {
                 position: absolute;
@@ -68,21 +86,35 @@
                 width: 100px;
                 text-align: center;
             }
-            .newMeal, .backb {
-                background-color: #c9e4d6;
+            .button-container {
+                display: flex;
+                justify-content: center;
+                gap: 10px;
+                padding-bottom: 20px;
+            }
+            #new-meal, #backButton, #accept-meal {
+                width: 120px;
+                padding: 10px;
                 border: none;
                 border-radius: 5px;
-                padding: 10px 20px;
-                color: black;
-                font-family: 'Cormorant', serif;
-                font-size: 16px;
-                width: 150px;
-                margin: 10px;
-                text-align: center;
                 cursor: pointer;
+                font-family: 'Cormorant', serif;
             }
-            .newMeal:hover, .backb:hover {
-                background-color: #b5d1c3;
+            #accept-meal {
+                background-color: #4CAF50;
+                color: white;
+            }
+            #accept-meal:disabled {
+                background-color: #cccccc;
+                cursor: not-allowed;
+            }
+            #new-meal {
+                background-color: #dba159;
+                color: white;
+            }
+            #backButton {
+                background-color: #c9e4d6;
+                color: #333;
             }
             .overlay-container {
                 display: none;
@@ -147,12 +179,24 @@
                 display: block;
                 font-family: 'Cormorant', serif;
             }
-            .button-container {
+            .food-saved {
+                color: #E4A853;
+                font-family: 'Cormorant', serif;
+                font-size: 24px;
                 position: absolute;
-                left: 300px;
-                top: 520px;
-                display: flex;
-                gap: 10px;
+                top: 20px;
+                right: 20px;
+                text-align: right;
+            }
+            .food-saved-text {
+                margin-right: 5px;
+            }
+            .potential-savings {
+                font-family: 'Cormorant', serif;
+                font-size: 16px;
+                color: #2E7D32;
+                margin: 10px 0;
+                font-weight: bold;
             }
         </style>
     </head>
@@ -166,7 +210,8 @@
         </h1>
         
         <div class="food-saved">
-            <strong>Food Saved:</strong> <span id="food-saved">0</span> lbs
+            <span class="food-saved-text">Food Saved:</span>
+            <span id="food-saved-amount">0 lbs</span>
         </div>
        
         <div class="image-container">
@@ -178,16 +223,18 @@
         </div>
 
         <div class="recipe-container">
-            <div id="recipe-title" class="recipe-title"></div>
-            <div id="match-score" class="match-score"></div>
-            <div id="recipe-instructions" class="recipe-instructions"></div>
-        </div>
-
-        <div class="button-container">
-            <button id="newMealButton" class="newMeal" type="submit">New Meal</button>
-            <a href="index.html" style="text-decoration: none;">
-                <button id="backButton" class="backb" type="submit">Back</button>
-            </a>
+            <div class="recipe-content">
+                <div id="recipe-title" class="recipe-title"></div>
+                <div id="match-score" class="match-score"></div>
+                <div id="potential-savings" class="potential-savings"></div>
+                <div id="recipe-ingredients" class="recipe-ingredients"></div>
+                <div id="recipe" class="recipe-instructions"></div>
+            </div>
+            <div class="button-container">
+                <button id="accept-meal">Accept Meal</button>
+                <button id="new-meal">New Meal</button>
+                <button id="backButton">Back</button>
+            </div>
         </div>
 
         <div id="popupOverlay" class="overlay-container">
@@ -229,61 +276,111 @@
         </div>
 
         <script>
+            let currentIngredients = [];
+            let excludedRecipes = [];
+            let totalFoodSaved = parseFloat(localStorage.getItem('totalFoodSaved')) || 0;
+
             document.addEventListener('DOMContentLoaded', function() {
                 const recipe = JSON.parse(localStorage.getItem('currentRecipe'));
-                const recipes = JSON.parse(localStorage.getItem('matchedRecipes'));
-                let currentIndex = parseInt(localStorage.getItem('currentIndex')) || 0;
-                
                 if (recipe) {
                     displayRecipe(recipe);
+                    currentIngredients = JSON.parse(localStorage.getItem('currentIngredients') || '[]');
+                    excludedRecipes = JSON.parse(localStorage.getItem('excludedRecipes') || '[]');
                 }
 
-                document.getElementById('newMealButton').addEventListener('click', function() {
-                    currentIndex++;
-                    if (recipes && currentIndex < recipes.length) {
-                        localStorage.setItem('currentIndex', currentIndex);
-                        localStorage.setItem('currentRecipe', JSON.stringify(recipes[currentIndex]));
-                        displayRecipe(recipes[currentIndex]);
-                    } else {
-                        alert('No more matching recipes available!');
+                // Update total food saved display
+                document.getElementById('food-saved-amount').textContent = `${totalFoodSaved.toFixed(1)} lbs`;
+
+                // Accept Meal button handler
+                document.getElementById('accept-meal').addEventListener('click', function() {
+                    const recipe = JSON.parse(localStorage.getItem('currentRecipe'));
+                    if (recipe && recipe.estimatedPounds) {
+                        totalFoodSaved += parseFloat(recipe.estimatedPounds);
+                        localStorage.setItem('totalFoodSaved', totalFoodSaved.toString());
+                        document.getElementById('food-saved-amount').textContent = `${totalFoodSaved.toFixed(1)} lbs`;
+                        this.disabled = true;
                     }
                 });
 
+                // New Meal button handler
+                document.getElementById('new-meal').addEventListener('click', function() {
+                    if (currentIngredients.length === 0) {
+                        alert('No ingredients available. Please start a new search.');
+                        window.location.href = 'index.html';
+                        return;
+                    }
+
+                    // Make API call to search for next recipe
+                    fetch(`/api/recipes/search?${currentIngredients.map(i => `ingredients=${encodeURIComponent(i)}`).join('&')}${excludedRecipes.map(id => `&excludeIds=${id}`).join('')}`)
+                        .then(response => response.json())
+                        .then(recipes => {
+                            if (recipes && recipes.length > 0) {
+                                const nextRecipe = recipes[0];
+                                displayRecipe(nextRecipe);
+                                if (nextRecipe.id) {
+                                    excludedRecipes.push(nextRecipe.id);
+                                    localStorage.setItem('excludedRecipes', JSON.stringify(excludedRecipes));
+                                }
+                            } else {
+                                alert('No more matching recipes found for these ingredients');
+                                // Clear storage and go back to start
+                                localStorage.removeItem('currentRecipe');
+                                localStorage.removeItem('excludedRecipes');
+                                localStorage.removeItem('currentIngredients');
+                                window.location.href = 'index.html';
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('Error finding recipes. Please try again.');
+                        });
+                });
+
+                // Back button handler
                 document.getElementById('backButton').addEventListener('click', function() {
-                    window.location.href = 'index.html';
+                    window.history.back();
                 });
             });
 
             function displayRecipe(recipe) {
-                const recipeTextArea = document.getElementById('recipe-instructions');
-                const matchScore = Math.round(recipe.matchScore * 100);
+                document.getElementById('recipe-title').textContent = recipe.title;
+                document.getElementById('recipe').textContent = recipe.instructions;
                 
-                let recipeText = `${recipe.name}\n\n`;
-                recipeText += `Ingredients:\n${recipe.ingredients.join(', ')}\n\n`;
-                recipeText += `Instructions:\n${recipe.instructions}\n\n`;
-                if (recipe.timing) {
-                    recipeText += `Time: ${recipe.timing} minutes`;
+                // Display ingredients as a list
+                const ingredientsList = recipe.ingredients
+                    .map(ingredient => {
+                        let text = `• ${ingredient.name}`;
+                        if (ingredient.quantity) {
+                            text = `• ${ingredient.quantity} ${ingredient.name}`;
+                        }
+                        return text;
+                    })
+                    .join('\n');
+                
+                // Show potential savings message
+                if (recipe.estimatedPounds > 0) {
+                    document.getElementById('potential-savings').textContent = 
+                        `This meal could save ${recipe.estimatedPounds.toFixed(1)} lbs of food!`;
+                } else {
+                    document.getElementById('potential-savings').textContent = '';
                 }
                 
-                recipeTextArea.textContent = recipeText;
+                document.getElementById('recipe-ingredients').textContent = 'Ingredients:\n' + ingredientsList;
                 
-                // Update match score
-                const matchScoreElement = document.getElementById('match-score');
-                if (matchScoreElement) {
-                    matchScoreElement.textContent = `Match: ${matchScore}%`;
-                }
+                // Reset accept button state
+                const acceptButton = document.getElementById('accept-meal');
+                acceptButton.disabled = false;
                 
-                const recipeTitleElement = document.getElementById('recipe-title');
-                if (recipeTitleElement) {
-                    recipeTitleElement.textContent = recipe.name;
-                }
+                const score = Math.round(recipe.matchScore * 100);
+                document.getElementById('match-score').textContent = `Match: ${score}%`;
+                localStorage.setItem('currentRecipe', JSON.stringify(recipe));
             }
 
             function togglePopup() {
                 const overlay = document.getElementById('popupOverlay');
                 overlay.classList.toggle('show');
             }
-            
+
             //FIRST MAGNET
             document.getElementById('upload-form1').addEventListener('submit', function (e) {
                 e.preventDefault();
